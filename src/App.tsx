@@ -1,24 +1,27 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+
+import firebase from "firebase";
+import { useCollectionData } from "react-firebase-hooks/firestore";
+
+firebase.firestore().useEmulator('localhost', 8080) // exemple
 
 function App() {
+
+  const [values, loading, error] = useCollectionData(firebase.firestore().collection("<collection-name>"), { idField: "id" })
+  if (loading || typeof values === 'undefined') {
+    return <div>Loading...</div>;
+  }
+  if (error) {
+    return <div>{`Error: ${error.message}`}</div>;
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <ul>
+      {values.map(value => (
+        <li key={value.id}>{value}</li>
+      ))}
+    </ul>
     </div>
   );
 }
